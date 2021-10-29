@@ -2,6 +2,7 @@ import subprocess
 import concurrent.futures
 import time
 import trparse
+import csv
 
 EXPERIMENT_TIME = 60
 MAX_WORKERS = 3
@@ -10,6 +11,11 @@ sample_sites = [
     "google.com",
 ]
 
+def run_single_traceroute_and_return_tree(site):
+    proc = subprocess.check_output("traceroute {}".format(site), shell=True, encoding='UTF-8')
+    out = proc
+    traceroute = trparse.loads(out)
+    return traceroute
 
 def run_traceroute(sites):
     # run traceroute
@@ -22,6 +28,35 @@ def run_traceroute(sites):
         #print(traceroute)
     # output your traceroute
     return results_dict
+
+def was_traceroute_successful(traceroute):
+    """Returns true if we found the resolved IP in the traceroute (success)."""
+    for hop in traceroute.hops:
+        probe = hop.probes[0]
+        if probe.ip == traceroute.dest_ip:
+            return True
+    return False
+
+def find_friendly_websites():
+    with open('data/top50sites.csv') as sitesfile:
+        sitereader = csv.reader(sitesfile)
+        for row in sitereader:
+            site = row[0]
+            try:
+                parsed_traceroute = run_single_traceroute_and_return_tree(site)
+                successful = was_traceroute_successful(parsed_traceroute)
+            except Exception:
+                print(f'Failed to run traceroute on {site}. Retrying in 10 seconds...')
+                time.sleep(10)
+                try:
+                    parsed_traceroute = run_single_traceroute_and_return_tree(site)
+                except Exception:
+                    successful = False
+
+            with open('output/top50sites_friendly_result.csv', 'a') as friendlyfile:
+                friendlywriter = csv.writer(friendlyfile)
+                friendlywriter.writerow([site, successful])
+
 
 if __name__ == "__main__":
     data = dict()
