@@ -3,6 +3,7 @@ import concurrent.futures
 import time
 import trparse
 import csv
+import pandas as pd
 
 EXPERIMENT_TIME = 60
 MAX_WORKERS = 3
@@ -21,7 +22,7 @@ def run_traceroute(sites):
     # run traceroute
     results_dict = {}
     for site in sites:
-        proc = subprocess.check_output("traceroute -A -q 1 {}".format(site), shell=True, encoding='UTF-8')
+        proc = subprocess.check_output("traceroute -a -q 1 {}".format(site), shell=True, encoding='UTF-8')
         out = proc
         traceroute = trparse.loads(out)
         results_dict[site] = traceroute
@@ -57,9 +58,31 @@ def find_friendly_websites():
                 friendlywriter = csv.writer(friendlyfile)
                 friendlywriter.writerow([site, successful])
 
-def trparse_tree_to_record(trparse_tree):
-    """Converts parsed traceroute tree into a record for our datatable."""
-    pass
+def trparse_tree_to_record(trparse_tree, max_hops=30, num_probes=1):
+    """Converts parsed traceroute tree into a pandas DataFrame record for our datatable."""
+    columns = ["dest name", "dest ip", "num hops"]
+    probe_atts = ["name", "ip", "asn", "rtt", "annotation"]
+    for h in range(1, max_hops+1):
+        for p in range(1, num_probes+1):
+            header = f"hop {h} probe {p} "
+            for att in probe_atts:
+                columns.append(header+att)
+
+    dest_name = trparse_tree.dest_name
+    dest_ip = trparse_tree.dest_ip
+    hops = len(trparse_tree.hops)
+    row = [dest_name, dest_ip, hops]
+
+    for hop in trparse_tree.hops:
+        for probe in hop.probes:
+            row.extend([probe.name, probe.ip, probe.asn, probe.rtt, probe.annotation])
+    
+    while len(row) < len(columns):
+        row.append(None)
+
+    return pd.DataFrame([row], columns=columns)
+
+
 
 if __name__ == "__main__":
     pass
