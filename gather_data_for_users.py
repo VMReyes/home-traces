@@ -27,8 +27,13 @@ def setup_output_folder():
 def run_traceroute(site):
     if sys.platform == "win32":
         proc = subprocess.check_output("tracert {}".format(site), shell=True, encoding='UTF-8')
-    else:
+    elif sys.platform == "linux" or sys.platform == "linux2":
         proc = subprocess.check_output("traceroute -A -q 1 {}".format(site), shell=True, encoding='UTF-8')
+    elif sys.platform == "darwin":
+        proc = subprocess.check_output("traceroute -a -q 1 {}".format(site), shell=True, encoding='UTF-8')
+    else:
+        print("Unknown Operating System.")
+        assert False
     return proc
 
 if __name__ == "__main__":
@@ -45,4 +50,5 @@ if __name__ == "__main__":
                 with open('output/results-' +str(EXPERIMENT_TIME)+'.csv', 'a') as outputfile:
                     outputwriter = csv.writer(outputfile)
                     outputwriter.writerow([timestamp, proc])
+            time.sleep(60*30)
 
