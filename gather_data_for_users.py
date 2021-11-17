@@ -34,6 +34,10 @@ def run_traceroute(site):
         proc = subprocess.check_output("traceroute -A -q 1 -m 30 {}".format(site), shell=True, encoding='UTF-8')
     elif sys.platform == "darwin":
         proc = subprocess.check_output("traceroute -a -q 1 -m 30 {}".format(site), shell=True, encoding='UTF-8', stderr=subprocess.STDOUT)
+        if "Warning" in proc:
+            split_proc = proc.split("\n")
+            new_proc = split_proc[1:]
+            proc = "\n".join(new_proc)
     else:
         print("Unknown Operating System.")
         assert False
