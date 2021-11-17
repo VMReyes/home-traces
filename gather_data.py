@@ -12,7 +12,7 @@ sample_sites = [
 ]
 
 def run_single_traceroute_and_return_tree(site):
-    proc = subprocess.check_output("traceroute {}".format(site), shell=True, encoding='UTF-8')
+    proc = subprocess.check_output("traceroute -A -q 1 {}".format(site), shell=True, encoding='UTF-8')
     out = proc
     traceroute = trparse.loads(out)
     return traceroute
@@ -21,11 +21,11 @@ def run_traceroute(sites):
     # run traceroute
     results_dict = {}
     for site in sites:
-        proc = subprocess.check_output("traceroute {}".format(site), shell=True, encoding='UTF-8')
+        proc = subprocess.check_output("traceroute -A -q 1 {}".format(site), shell=True, encoding='UTF-8')
         out = proc
         traceroute = trparse.loads(out)
         results_dict[site] = traceroute
-        #print(traceroute)
+        print(traceroute)
     # output your traceroute
     return results_dict
 
@@ -57,15 +57,19 @@ def find_friendly_websites():
                 friendlywriter = csv.writer(friendlyfile)
                 friendlywriter.writerow([site, successful])
 
+def trparse_tree_to_record(trparse_tree):
+    """Converts parsed traceroute tree into a record for our datatable."""
+    pass
 
 if __name__ == "__main__":
-    data = dict()
-    for i in range(10):
-        experiment_time = time.time()
-        sample = run_traceroute(sample_sites)
-        data[experiment_time] = sample
-        time.sleep(1)
-    print(data)
+    pass
+    #data = dict()
+    #for i in range(10):
+    #    experiment_time = time.time()
+    #    sample = run_traceroute(sample_sites)
+    #    data[experiment_time] = sample
+    #    time.sleep(1)
+    #print(data)
     #while True:
     #    experiment_time = time.time()
     #    results = []
