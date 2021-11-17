@@ -30,7 +30,7 @@ def run_traceroute(site):
     elif sys.platform == "linux" or sys.platform == "linux2":
         proc = subprocess.check_output("traceroute -A -q 1 {}".format(site), shell=True, encoding='UTF-8')
     elif sys.platform == "darwin":
-        proc = subprocess.check_output("traceroute -a -q 1 {}".format(site), shell=True, encoding='UTF-8')
+        proc = subprocess.check_output("traceroute -a -q 1 {}".format(site), shell=True, encoding='UTF-8', stderr=subprocess.STDOUT)
     else:
         print("Unknown Operating System.")
         assert False
