@@ -58,7 +58,7 @@ def find_friendly_websites():
                 friendlywriter = csv.writer(friendlyfile)
                 friendlywriter.writerow([site, successful])
 
-def trparse_tree_to_record(trparse_tree, max_hops=30, num_probes=1):
+def trparse_tree_to_record(trparse_trees, max_hops=30, num_probes=1):
     """Converts parsed traceroute tree into a pandas DataFrame record for our datatable."""
     columns = ["dest name", "dest ip", "num hops"]
     probe_atts = ["name", "ip", "asn", "rtt", "annotation"]
@@ -68,19 +68,23 @@ def trparse_tree_to_record(trparse_tree, max_hops=30, num_probes=1):
             for att in probe_atts:
                 columns.append(header+att)
 
-    dest_name = trparse_tree.dest_name
-    dest_ip = trparse_tree.dest_ip
-    hops = len(trparse_tree.hops)
-    row = [dest_name, dest_ip, hops]
+    rows = []
+    for trparse_tree in trparse_trees:
+        row = []
+        dest_name = trparse_tree.dest_name
+        dest_ip = trparse_tree.dest_ip
+        hops = len(trparse_tree.hops)
+        row = [dest_name, dest_ip, hops]
 
-    for hop in trparse_tree.hops:
-        for probe in hop.probes:
-            row.extend([probe.name, probe.ip, probe.asn, probe.rtt, probe.annotation])
-    
-    while len(row) < len(columns):
-        row.append(None)
+        for hop in trparse_tree.hops:
+            for probe in hop.probes:
+                row.extend([probe.name, probe.ip, probe.asn, probe.rtt, probe.annotation])
+        
+        while len(row) < len(columns):
+            row.append(None)
+        rows.append(row)
 
-    return pd.DataFrame([row], columns=columns)
+    return pd.DataFrame(rows, columns=columns)
 
 
 
