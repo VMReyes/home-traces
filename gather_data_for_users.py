@@ -4,11 +4,7 @@ import csv
 import os
 import sys
 
-from gather_data import EXPERIMENT_TIME
-
 EXPERIMENT_START_TIME = int(time.time())
-EXPERIENT_LENGTH_HOURS = 8
-START_TIME = 10000000
 OUTPUT_PATH = 'output/'
 
 def load_sites():
@@ -46,16 +42,15 @@ def run_traceroute(site):
 if __name__ == "__main__":
     setup_output_folder()
     sites = load_sites()
-    if(time.time() >= START_TIME):
-        while (time.time() < EXPERIMENT_START_TIME + EXPERIENT_LENGTH_HOURS * 60 * 6):
-            for site in sites:
-                timestamp = time.time()
-                try:
-                    proc = run_traceroute(site)
-                except:
-                    continue
-                with open('output/results-' +str(EXPERIMENT_START_TIME)+'.csv', 'a') as outputfile:
-                    outputwriter = csv.writer(outputfile)
-                    outputwriter.writerow([timestamp, proc])
-            time.sleep(60*30)
+    while (True):
+        for site in sites:
+            timestamp = time.time()
+            try:
+                proc = run_traceroute(site)
+            except:
+                continue
+            with open('output/results-' +str(EXPERIMENT_START_TIME)+'.csv', 'a') as outputfile:
+                outputwriter = csv.writer(outputfile)
+                outputwriter.writerow([timestamp, proc])
+        time.sleep(60*20)
 
