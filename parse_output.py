@@ -14,6 +14,6 @@ def parse_output(path):
     return gather_data.trparse_tree_to_record(trparse_trees)
 
 if __name__ == "__main__":
-    path = "output/results-1637191393.csv" # Change on your machine
+    path = "data/results-1637199367-linux.csv" # Change on your machine
     df = parse_output(path)
-    print(df.head())
+    print(df)
