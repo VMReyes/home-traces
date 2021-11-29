@@ -34,11 +34,13 @@ def parse_output(path):
     output_df = pd.read_csv(path, names=["time", "traceroute"])
     trparse_trees = []
     for ind, row in output_df.iterrows():
-        print(row)
+        # print(row)
         trparse_tree = trparse.loads(row["traceroute"])
         trparse_trees.append(trparse_tree)
-
-    return trparse_tree_to_record(trparse_trees)
+    
+    traceroute_df = trparse_tree_to_record(trparse_trees)
+    traceroute_df['time'] = output_df['time']
+    return traceroute_df
 
 if __name__ == "__main__":
     path = "data/results-1637199367-linux.csv" # Change on your machine
