@@ -4,7 +4,7 @@ from ipwhois.net import Net
 from ipwhois.asn import IPASN
 
 def gen_ip_to_asn(df):
-    cols = ["target ip", "asn", "asn cidr", "asn country cod", "asn date", "asn description", "asn registry"]
+    cols = ["target ip", "asn", "asn cidr", "asn country code", "asn date", "asn description", "asn registry"]
     rows = []
     ip_to_asn = {}
     for ind, row in df.iterrows():
